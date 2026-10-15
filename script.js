@@ -139,38 +139,32 @@
   }
 
   function burstConfetti() {
-    // Layered celebration using the canvas-confetti library loaded in index.html.
+    // A much bigger, multi-wave celebration using canvas-confetti.
     if (typeof confetti !== "function") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const palette = ["#e53935", "#f9a825", "#43a047", "#1e88e5", "#8e24aa", "#00acc1", "#ffffff"];
     const base = { colors: palette, zIndex: 20, disableForReducedMotion: true };
+    const fire = (options) => confetti(Object.assign({}, base, options));
 
-    // Layer several bursts to create depth, varied particle sizes and a less uniform spread.
-    confetti(Object.assign({}, base, {
-      particleCount: 90, spread: 62, startVelocity: 52,
-      origin: { x: 0.5, y: 0.62 }, scalar: 1.05
-    }));
-    confetti(Object.assign({}, base, {
-      particleCount: 55, spread: 100, startVelocity: 38, decay: 0.91,
-      origin: { x: 0.5, y: 0.62 }, scalar: 0.9
-    }));
-    confetti(Object.assign({}, base, {
-      particleCount: 35, spread: 130, startVelocity: 28, decay: 0.92,
-      origin: { x: 0.5, y: 0.62 }, scalar: 1.2, shapes: ["square", "star"]
-    }));
+    // Dense central blast with broad, overlapping layers.
+    fire({ particleCount: 180, spread: 78, startVelocity: 58, origin: { x: 0.5, y: 0.62 }, scalar: 1.15, ticks: 260 });
+    fire({ particleCount: 140, spread: 115, startVelocity: 48, decay: 0.91, origin: { x: 0.5, y: 0.62 }, scalar: 1.05, ticks: 280 });
+    fire({ particleCount: 90, spread: 145, startVelocity: 36, decay: 0.92, origin: { x: 0.5, y: 0.62 }, scalar: 1.35, shapes: ["square", "star"], ticks: 300 });
 
-    // Short side cannons add a second wave without leaving a long animation running.
+    // Big cannons from both sides, followed by two extra volleys.
+    const sideVolley = () => {
+      fire({ particleCount: 90, angle: 60, spread: 72, startVelocity: 58, origin: { x: 0.02, y: 0.72 }, scalar: 1.05, ticks: 260 });
+      fire({ particleCount: 90, angle: 120, spread: 72, startVelocity: 58, origin: { x: 0.98, y: 0.72 }, scalar: 1.05, ticks: 260 });
+    };
+    setTimeout(sideVolley, 180);
     setTimeout(() => {
-      confetti(Object.assign({}, base, {
-        particleCount: 42, angle: 60, spread: 58, startVelocity: 48,
-        origin: { x: 0.04, y: 0.72 }, scalar: 0.9
-      }));
-      confetti(Object.assign({}, base, {
-        particleCount: 42, angle: 120, spread: 58, startVelocity: 48,
-        origin: { x: 0.96, y: 0.72 }, scalar: 0.9
-      }));
-    }, 140);
+      fire({ particleCount: 100, spread: 100, startVelocity: 46, origin: { x: 0.5, y: 0.55 }, scalar: 1.1, ticks: 280 });
+      sideVolley();
+    }, 650);
+    setTimeout(() => {
+      fire({ particleCount: 70, spread: 130, startVelocity: 34, decay: 0.92, origin: { x: 0.5, y: 0.55 }, scalar: 1.3, shapes: ["square", "star"], ticks: 300 });
+    }, 1150);
   }
 
   spinButton.addEventListener("click", spin);
