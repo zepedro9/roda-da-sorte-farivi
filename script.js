@@ -130,6 +130,7 @@
         drawWheel(rotation);
         spinning = false;
         spinButton.disabled = true;
+        spinButton.classList.add("is-finished");
         buttonLabel.textContent = prizes[selectedPrizeIndex];
         burstConfetti();
       }
@@ -138,26 +139,45 @@
   }
 
   function burstConfetti() {
-    const symbols = ["★", "●", "■", "✦"];
-    for (let i = 0; i < 24; i++) {
-      const el = document.createElement("span");
-      el.textContent = symbols[i % symbols.length];
-      Object.assign(el.style, {
+    const shapes = ["■", "●", "◆", "★"];
+    const viewportWidth = window.innerWidth;
+    const originX = viewportWidth / 2;
+    const originY = Math.min(window.innerHeight * 0.42, 420);
+    const particleCount = 54;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement("span");
+      const angle = (Math.PI * 2 * i / particleCount) + (Math.random() - 0.5) * 0.7;
+      const distance = 100 + Math.random() * Math.min(260, viewportWidth * 0.42);
+      const driftX = Math.cos(angle) * distance + (Math.random() - 0.5) * 100;
+      const driftY = Math.sin(angle) * distance + 80 + Math.random() * 220;
+      const spin = (Math.random() - 0.5) * 1200;
+      const delay = Math.random() * 180;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      particle.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+      Object.assign(particle.style, {
         position: "fixed",
-        left: Math.random() * 100 + "vw",
-        top: "-24px",
+        left: originX + (Math.random() - 0.5) * 36 + "px",
+        top: originY + (Math.random() - 0.5) * 30 + "px",
         zIndex: "10",
         pointerEvents: "none",
-        color: colors[i % colors.length],
-        fontSize: (10 + Math.random() * 10) + "px",
-        transition: "transform 1.4s ease-in, opacity 1.8s ease"
+        userSelect: "none",
+        color,
+        fontSize: (8 + Math.random() * 13) + "px",
+        lineHeight: "1",
+        opacity: "1",
+        transform: "translate(-50%, -50%) scale(" + (0.7 + Math.random() * 0.8) + ") rotate(0deg)",
+        transition: "transform " + (900 + Math.random() * 900) + "ms cubic-bezier(.12,.7,.25,1), opacity " + (1000 + Math.random() * 800) + "ms ease-out",
+        transitionDelay: delay + "ms"
       });
-      document.body.appendChild(el);
+      document.body.appendChild(particle);
+
       requestAnimationFrame(() => {
-        el.style.transform = "translate(" + ((Math.random() - 0.5) * 180) + "px, " + (window.innerHeight + 60) + "px) rotate(" + (Math.random() * 700) + "deg)";
-        el.style.opacity = "0";
+        particle.style.transform = "translate(" + driftX + "px, " + driftY + "px) rotate(" + spin + "deg) scale(" + (0.25 + Math.random() * 0.6) + ")";
+        particle.style.opacity = "0";
       });
-      setTimeout(() => el.remove(), 2200);
+      setTimeout(() => particle.remove(), 2200 + delay);
     }
   }
 
