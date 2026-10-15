@@ -17,7 +17,8 @@
       ctx.save();
       const mid=start+slice/2;
       ctx.rotate(mid);
-      if(mid>Math.PI/2 && mid<Math.PI*3/2)ctx.rotate(Math.PI);
+      const absoluteMid=((angle+mid)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+      if(absoluteMid>Math.PI/2 && absoluteMid<Math.PI*3/2)ctx.rotate(Math.PI);
       ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";ctx.shadowColor="#37164c40";ctx.shadowBlur=4;
       const label=prizes[i], labelRadius=radius*0.63, maxLabelWidth=235;
       let fontSize=31;
