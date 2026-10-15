@@ -10,7 +10,7 @@
     "Vale 200€ para viagem"
   ];
   const selectedPrizeIndex = 5;
-  const colors = ["#ff6b9d", "#ffbd59", "#55d6be", "#7c83fd", "#b47aea", "#ff8b5e"];
+  const colors = ["#e53935", "#f9a825", "#43a047", "#1e88e5", "#8e24aa", "#00acc1"];
   const canvas = document.getElementById("wheel");
   const ctx = canvas && canvas.getContext("2d");
   const spinButton = document.getElementById("spin-button");
@@ -23,6 +23,7 @@
   const slice = (Math.PI * 2) / prizes.length;
   let rotation = 0;
   let spinning = false;
+  let hasSpun = false;
 
   function wrapText(text, maxWidth, font) {
     ctx.font = font;
@@ -102,8 +103,9 @@
   const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
 
   function spin() {
-    if (spinning) return;
+    if (spinning || hasSpun) return;
     spinning = true;
+    hasSpun = true;
     spinButton.disabled = true;
     buttonLabel.textContent = "A girar…";
 
@@ -127,7 +129,7 @@
         rotation = endRotation;
         drawWheel(rotation);
         spinning = false;
-        spinButton.disabled = false;
+        spinButton.disabled = true;
         buttonLabel.textContent = prizes[selectedPrizeIndex];
         burstConfetti();
       }
@@ -136,7 +138,7 @@
   }
 
   function burstConfetti() {
-    const symbols = ["✦", "✧", "●", "♥", "★"];
+    const symbols = ["★", "●", "■", "✦"];
     for (let i = 0; i < 24; i++) {
       const el = document.createElement("span");
       el.textContent = symbols[i % symbols.length];
@@ -147,15 +149,15 @@
         zIndex: "10",
         pointerEvents: "none",
         color: colors[i % colors.length],
-        fontSize: (14 + Math.random() * 18) + "px",
-        transition: "transform " + (1.8 + Math.random()) + "s ease-in, opacity 2.5s ease"
+        fontSize: (10 + Math.random() * 10) + "px",
+        transition: "transform 1.4s ease-in, opacity 1.8s ease"
       });
       document.body.appendChild(el);
       requestAnimationFrame(() => {
         el.style.transform = "translate(" + ((Math.random() - 0.5) * 180) + "px, " + (window.innerHeight + 60) + "px) rotate(" + (Math.random() * 700) + "deg)";
         el.style.opacity = "0";
       });
-      setTimeout(() => el.remove(), 3000);
+      setTimeout(() => el.remove(), 2200);
     }
   }
 
