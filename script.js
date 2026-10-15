@@ -64,16 +64,11 @@
 
       // Place wrapped labels tangentially inside each slice.
       const mid = start + slice / 2;
-      const absoluteMid = ((angle + mid) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
       ctx.save();
       ctx.rotate(mid);
       ctx.translate(radius * 0.61, 0);
-      // Tangential text; reverse direction on the left half so it remains readable.
-      if (absoluteMid > Math.PI / 2 && absoluteMid < Math.PI * 3 / 2) {
-        ctx.rotate(-Math.PI / 2);
-      } else {
-        ctx.rotate(Math.PI / 2);
-      }
+      // Fixed radial orientation: each label's bottom always points outwards.
+      ctx.rotate(Math.PI / 2);
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
