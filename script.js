@@ -139,46 +139,38 @@
   }
 
   function burstConfetti() {
-    const shapes = ["■", "●", "◆", "★"];
-    const viewportWidth = window.innerWidth;
-    const originX = viewportWidth / 2;
-    const originY = Math.min(window.innerHeight * 0.42, 420);
-    const particleCount = 54;
+    // Layered celebration using the canvas-confetti library loaded in index.html.
+    if (typeof confetti !== "function") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement("span");
-      const angle = (Math.PI * 2 * i / particleCount) + (Math.random() - 0.5) * 0.7;
-      const distance = 100 + Math.random() * Math.min(260, viewportWidth * 0.42);
-      const driftX = Math.cos(angle) * distance + (Math.random() - 0.5) * 100;
-      const driftY = Math.sin(angle) * distance + 80 + Math.random() * 220;
-      const spin = (Math.random() - 0.5) * 1200;
-      const delay = Math.random() * 180;
-      const color = colors[Math.floor(Math.random() * colors.length)];
+    const palette = ["#e53935", "#f9a825", "#43a047", "#1e88e5", "#8e24aa", "#00acc1", "#ffffff"];
+    const base = { colors: palette, zIndex: 20, disableForReducedMotion: true };
 
-      particle.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-      Object.assign(particle.style, {
-        position: "fixed",
-        left: originX + (Math.random() - 0.5) * 36 + "px",
-        top: originY + (Math.random() - 0.5) * 30 + "px",
-        zIndex: "10",
-        pointerEvents: "none",
-        userSelect: "none",
-        color,
-        fontSize: (8 + Math.random() * 13) + "px",
-        lineHeight: "1",
-        opacity: "1",
-        transform: "translate(-50%, -50%) scale(" + (0.7 + Math.random() * 0.8) + ") rotate(0deg)",
-        transition: "transform " + (900 + Math.random() * 900) + "ms cubic-bezier(.12,.7,.25,1), opacity " + (1000 + Math.random() * 800) + "ms ease-out",
-        transitionDelay: delay + "ms"
-      });
-      document.body.appendChild(particle);
+    // Layer several bursts to create depth, varied particle sizes and a less uniform spread.
+    confetti(Object.assign({}, base, {
+      particleCount: 90, spread: 62, startVelocity: 52,
+      origin: { x: 0.5, y: 0.62 }, scalar: 1.05
+    }));
+    confetti(Object.assign({}, base, {
+      particleCount: 55, spread: 100, startVelocity: 38, decay: 0.91,
+      origin: { x: 0.5, y: 0.62 }, scalar: 0.9
+    }));
+    confetti(Object.assign({}, base, {
+      particleCount: 35, spread: 130, startVelocity: 28, decay: 0.92,
+      origin: { x: 0.5, y: 0.62 }, scalar: 1.2, shapes: ["square", "star"]
+    }));
 
-      requestAnimationFrame(() => {
-        particle.style.transform = "translate(" + driftX + "px, " + driftY + "px) rotate(" + spin + "deg) scale(" + (0.25 + Math.random() * 0.6) + ")";
-        particle.style.opacity = "0";
-      });
-      setTimeout(() => particle.remove(), 2200 + delay);
-    }
+    // Short side cannons add a second wave without leaving a long animation running.
+    setTimeout(() => {
+      confetti(Object.assign({}, base, {
+        particleCount: 42, angle: 60, spread: 58, startVelocity: 48,
+        origin: { x: 0.04, y: 0.72 }, scalar: 0.9
+      }));
+      confetti(Object.assign({}, base, {
+        particleCount: 42, angle: 120, spread: 58, startVelocity: 48,
+        origin: { x: 0.96, y: 0.72 }, scalar: 0.9
+      }));
+    }, 140);
   }
 
   spinButton.addEventListener("click", spin);
