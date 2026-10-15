@@ -17,8 +17,10 @@ Site estático em HTML, CSS e JavaScript. Não precisa de backend nem de base de
 
 ## Alterar os prémios ou resultado
 
+Os prémios estão configurados pela seguinte ordem: raspadinha de 5€, jantar num restaurante à escolha, carro, noite no Sheraton Hotel, iPhone 18 Pro Max e vale de 200€ para viagem.
+
 Edite `script.js`:
 - `prizes`: os seis textos que aparecem na roda.
-- `selectedPrizeIndex`: índice do resultado final a partir de zero. O valor `2` corresponde a **Prémio 3**.
+- `selectedPrizeIndex`: índice do resultado final a partir de zero. O valor `5` corresponde a **Vale 200€ para viagem**.
 
 O número de voltas e o tempo da animação variam, mas o resultado final está predefinido. Como o código é público, esta lógica pode ser consultada no repositório.
