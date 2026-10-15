@@ -15,7 +15,6 @@
   const ctx = canvas && canvas.getContext("2d");
   const spinButton = document.getElementById("spin-button");
   const buttonLabel = document.getElementById("button-label");
-
   if (!canvas || !ctx || !spinButton || !buttonLabel) return;
 
   const size = canvas.width;
@@ -24,6 +23,24 @@
   const slice = (Math.PI * 2) / prizes.length;
   let rotation = 0;
   let spinning = false;
+
+  function wrapText(text, maxWidth, font) {
+    ctx.font = font;
+    const words = text.split(" ");
+    const lines = [];
+    let line = "";
+    for (const word of words) {
+      const candidate = line ? line + " " + word : word;
+      if (ctx.measureText(candidate).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
 
   function drawWheel(angle = 0) {
     ctx.clearRect(0, 0, size, size);
@@ -45,29 +62,42 @@
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      // Keep every prize name inside its own coloured segment.
-      ctx.save();
+      // Place wrapped labels tangentially inside each slice.
       const mid = start + slice / 2;
+      const absoluteMid = ((angle + mid) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      ctx.save();
       ctx.rotate(mid);
+      ctx.translate(radius * 0.61, 0);
+      if (absoluteMid > Math.PI / 2 && absoluteMid < Math.PI * 3 / 2) {
+        ctx.rotate(Math.PI);
+      } else {
+        ctx.rotate(Math.PI / 2);
+      }
+      // Normalize the text angle: upright on both halves of the wheel.
+      if (absoluteMid > Math.PI / 2 && absoluteMid < Math.PI * 3 / 2) {
+        ctx.rotate(-Math.PI / 2);
+      } else {
+        ctx.rotate(Math.PI / 2);
+      }
+
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#ffffff";
       ctx.shadowColor = "rgba(41, 19, 75, 0.28)";
       ctx.shadowBlur = 3;
 
-      let fontSize = 29;
-      const maxTextWidth = radius * 0.68;
-      ctx.font = "700 " + fontSize + "px system-ui, sans-serif";
-      while (ctx.measureText(prizes[i]).width > maxTextWidth && fontSize > 15) {
+      let fontSize = 24;
+      let lines = wrapText(prizes[i], 112, "700 " + fontSize + "px system-ui, sans-serif");
+      while (lines.length > 3 && fontSize > 15) {
         fontSize -= 1;
-        ctx.font = "700 " + fontSize + "px system-ui, sans-serif";
+        lines = wrapText(prizes[i], 112, "700 " + fontSize + "px system-ui, sans-serif");
       }
-
-      // Text follows the segment but stays on the readable side.
-      if (Math.cos(mid) < 0) {
-        ctx.rotate(Math.PI);
-      }
-      ctx.fillText(prizes[i], radius * 0.62, 0, maxTextWidth);
+      ctx.font = "700 " + fontSize + "px system-ui, sans-serif";
+      const lineHeight = fontSize * 1.12;
+      const startY = -((lines.length - 1) * lineHeight) / 2;
+      lines.forEach((line, lineIndex) => {
+        ctx.fillText(line, 0, startY + lineIndex * lineHeight, 112);
+      });
       ctx.restore();
     }
 
@@ -79,13 +109,10 @@
     ctx.restore();
   }
 
-  function easeOutQuint(t) {
-    return 1 - Math.pow(1 - t, 5);
-  }
+  const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
 
   function spin() {
     if (spinning) return;
-
     spinning = true;
     spinButton.disabled = true;
     buttonLabel.textContent = "A girar…";
@@ -104,7 +131,6 @@
       const progress = Math.min(1, (now - startTime) / duration);
       rotation = startRotation + (endRotation - startRotation) * easeOutQuint(progress);
       drawWheel(rotation);
-
       if (progress < 1) {
         requestAnimationFrame(frame);
       } else {
@@ -116,7 +142,6 @@
         burstConfetti();
       }
     }
-
     requestAnimationFrame(frame);
   }
 
