@@ -4,7 +4,7 @@
   const prizes = [
     "Raspadinha de 5€",
     "Jantar restaurante à escolha",
-    "Carro",
+    "Mala nova",
     "Noite no Sheraton Hotel",
     "iPhone 18 Pro Max",
     "Vale 200€ para viagem"
