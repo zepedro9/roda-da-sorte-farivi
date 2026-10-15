@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7c3aed">
+  <meta name="description" content="Roda da Sorte do Farivi — uma pequena surpresa colorida.">
+  <title>Roda da Sorte do Farivi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <div class="confetti confetti-a" aria-hidden="true">✦</div>
+    <div class="confetti confetti-b" aria-hidden="true">✧</div>
+    <header class="hero">
+      <p class="eyebrow">UMA SURPRESA ESPECIAL</p>
+      <h1>Roda da Sorte <span>do Farivi</span></h1>
+      <p class="subtitle">Respira fundo… e vamos descobrir a surpresa!</p>
+    </header>
+    <section class="wheel-card" aria-label="Roda da sorte">
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" width="700" height="700" aria-label="Roda com seis prémios"></canvas>
+        <div class="wheel-center" aria-hidden="true"><span>✨</span></div>
+      </div>
+      <button id="spin-button" class="spin-button" type="button"><span class="button-icon" aria-hidden="true">✦</span>Girar a roda</button>
+      <p id="status" class="status" aria-live="polite">Carrega no botão para revelar a surpresa.</p>
+    </section>
+    <section id="result" class="result" hidden aria-live="polite">
+      <div class="result-sparkle" aria-hidden="true">🎉</div>
+      <p class="result-label">A tua surpresa é…</p>
+      <h2 id="result-name">Prémio 3</h2>
+      <p class="result-note">Espero que gostes! 💖</p>
+      <button id="again-button" class="again-button" type="button">Girar novamente</button>
+    </section>
+    <footer>Feito com carinho <span aria-hidden="true">♥</span></footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
