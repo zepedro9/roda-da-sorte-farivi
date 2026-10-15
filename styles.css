@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fredoka:wght@500;600;700&display=swap');
+:root{--ink:#29134b;--purple:#7c3aed;--pink:#ff4fa3;--yellow:#ffd84d}
+*{box-sizing:border-box}
+html{min-height:100%}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;background:radial-gradient(circle at 12% 15%,#ffe0f1 0,transparent 27rem),radial-gradient(circle at 88% 12%,#e4dcff 0,transparent 29rem),linear-gradient(145deg,#fff8fd,#f4efff 55%,#fff8e8)}
+.page{width:min(100% - 28px,720px);margin:0 auto;padding:32px 0 20px;position:relative;text-align:center}
+.hero{margin:0 auto 22px}.eyebrow{color:#a03d9c;font-size:.75rem;font-weight:700;letter-spacing:.2em;margin:0 0 10px}
+h1{font-family:Fredoka,system-ui,sans-serif;font-size:clamp(2.1rem,7vw,3.6rem);line-height:1.05;margin:0;letter-spacing:-.035em}
+h1 span{display:block;color:#e83e98}.subtitle{color:#705b84;font-size:clamp(.95rem,3vw,1.08rem);margin:14px 0 0}
+.wheel-card{border:1px solid #7c3aed22;background:#ffffffcc;border-radius:30px;box-shadow:0 22px 65px #532d211f;padding:clamp(16px,4vw,30px);backdrop-filter:blur(8px)}
+.wheel-wrap{width:min(100%,510px);margin:0 auto;position:relative;aspect-ratio:1;filter:drop-shadow(0 12px 12px #38185726)}
+canvas{width:100%;height:100%;display:block}
+.pointer{position:absolute;z-index:3;top:-3px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:21px solid transparent;border-right:21px solid transparent;border-top:44px solid #35134f;filter:drop-shadow(0 4px 1px #0002)}
+.pointer:after{content:"";position:absolute;left:-9px;top:-43px;border-left:9px solid transparent;border-right:9px solid transparent;border-top:19px solid #fff}
+.wheel-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17%;aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#fff,#ffe5f4);border:7px solid #fff;box-shadow:0 2px 0 #d9b8ed,0 0 0 3px #7c3aed;font-size:clamp(1.15rem,5vw,2rem)}
+.spin-button,.again-button{appearance:none;border:0;border-radius:999px;color:#fff;font:700 1.05rem "DM Sans",system-ui,sans-serif;padding:16px 28px;cursor:pointer;background:linear-gradient(100deg,#7c3aed,#e83e98);box-shadow:0 8px 0 #4c218d,0 14px 24px #7c3aed38;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;margin-top:24px}
+.spin-button:hover,.again-button:hover{filter:brightness(1.06);transform:translateY(-2px)}.spin-button:active,.again-button:active{transform:translateY(4px);box-shadow:0 4px 0 #4c218d}.spin-button:disabled{cursor:wait;opacity:.78}.button-icon{margin-right:8px;color:var(--yellow)}
+.status{color:#7b668c;font-size:.9rem;margin:19px 0 0;min-height:1.3em}
+.result{margin:20px auto 0;padding:24px 18px 26px;border-radius:26px;background:linear-gradient(135deg,#fff,#fff0f8);border:2px solid #e83e9838;box-shadow:0 18px 45px #e83e981f;animation:pop-in .55s cubic-bezier(.2,.9,.25,1.2) both}
+.result[hidden]{display:none}.result-sparkle{font-size:2.4rem}.result-label{color:#a03d9c;font-weight:700;margin:8px 0}.result h2{font:700 clamp(2rem,7vw,3rem) Fredoka,system-ui,sans-serif;margin:0;color:#e83e98}.result-note{color:#705b84;margin-bottom:0}
+.again-button{margin-top:18px;padding:12px 20px;font-size:.92rem}footer{color:#9a87a8;font-size:.8rem;padding:26px 0 0}footer span{color:#e83e98}
+.confetti{position:absolute;font-size:2.4rem;color:#f3a92e;pointer-events:none}.confetti-a{top:85px;left:0;transform:rotate(-15deg)}.confetti-b{top:140px;right:0;color:#e83e98;transform:rotate(15deg)}
+@keyframes pop-in{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:420px){.page{width:min(100% - 20px,720px);padding-top:24px}.wheel-card{border-radius:23px;padding:12px}.pointer{border-left-width:17px;border-right-width:17px;border-top-width:36px}.pointer:after{top:-35px}.spin-button{margin-top:20px;width:100%}.confetti{font-size:1.7rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
