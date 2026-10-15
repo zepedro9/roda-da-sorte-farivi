@@ -25,6 +25,61 @@
   let spinning = false;
   let hasSpun = false;
 
+  // Generate wheel ticks and a celebratory sparkle using Web Audio; no audio files required.
+  let audioContext = null;
+  let lastTickAt = 0;
+  let tickCounter = 0;
+
+  function prepareAudio() {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      if (!audioContext) audioContext = new AudioContextClass();
+      if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+      return audioContext;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function playTone(frequency, duration, type, volume, delay = 0) {
+    const audio = prepareAudio();
+    if (!audio) return;
+    try {
+      const startAt = audio.currentTime + delay;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = type || "sine";
+      oscillator.frequency.setValueAtTime(frequency, startAt);
+      gain.gain.setValueAtTime(0.0001, startAt);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), startAt + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start(startAt);
+      oscillator.stop(startAt + duration + 0.025);
+    } catch (_) {}
+  }
+
+  function playWheelTick(progress) {
+    const now = performance.now();
+    const interval = 42 + progress * 180;
+    if (now - lastTickAt < interval) return;
+    lastTickAt = now;
+    tickCounter++;
+    playTone(620 + (tickCounter % 3) * 85, 0.045, "square", 0.035);
+  }
+
+  function playCelebrationSound() {
+    // Bright ascending chime when the wheel lands, with a soft sparkling tail.
+    [[523.25, 0], [659.25, 0.11], [783.99, 0.22], [1046.5, 0.36], [1318.5, 0.52]].forEach(([frequency, delay], i) => {
+      playTone(frequency, 0.42, "sine", i === 4 ? 0.11 : 0.085, delay);
+    });
+    [1568, 2093, 1760, 2349, 1976, 2637].forEach((frequency, i) => {
+      playTone(frequency, 0.22, "triangle", 0.045, 0.72 + i * 0.085);
+    });
+  }
+
   function wrapText(text, maxWidth, font) {
     ctx.font = font;
     const words = text.split(" ");
@@ -104,6 +159,9 @@
 
   function spin() {
     if (spinning || hasSpun) return;
+    prepareAudio(); // The click gesture unlocks audio on supported browsers.
+    lastTickAt = 0;
+    tickCounter = 0;
     spinning = true;
     hasSpun = true;
     spinButton.disabled = true;
@@ -123,6 +181,7 @@
       const progress = Math.min(1, (now - startTime) / duration);
       rotation = startRotation + (endRotation - startRotation) * easeOutQuint(progress);
       drawWheel(rotation);
+      playWheelTick(progress);
       if (progress < 1) {
         requestAnimationFrame(frame);
       } else {
@@ -132,6 +191,7 @@
         spinButton.disabled = true;
         spinButton.classList.add("is-finished");
         buttonLabel.textContent = prizes[selectedPrizeIndex];
+        playCelebrationSound();
         burstConfetti();
       }
     }
