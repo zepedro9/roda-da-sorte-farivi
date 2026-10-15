@@ -68,12 +68,7 @@
       ctx.save();
       ctx.rotate(mid);
       ctx.translate(radius * 0.61, 0);
-      if (absoluteMid > Math.PI / 2 && absoluteMid < Math.PI * 3 / 2) {
-        ctx.rotate(Math.PI);
-      } else {
-        ctx.rotate(Math.PI / 2);
-      }
-      // Normalize the text angle: upright on both halves of the wheel.
+      // Tangential text; reverse direction on the left half so it remains readable.
       if (absoluteMid > Math.PI / 2 && absoluteMid < Math.PI * 3 / 2) {
         ctx.rotate(-Math.PI / 2);
       } else {
