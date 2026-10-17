@@ -98,6 +98,46 @@
     return lines;
   }
 
+  function drawSnowflake(x, y, size, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.8;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    for (let arm = 0; arm < 6; arm++) {
+      ctx.save();
+      ctx.rotate((Math.PI * 2 * arm) / 6);
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -size);
+      ctx.moveTo(0, -size * 0.58);
+      ctx.lineTo(-size * 0.25, -size * 0.78);
+      ctx.moveTo(0, -size * 0.58);
+      ctx.lineTo(size * 0.25, -size * 0.78);
+      ctx.restore();
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawStar(x, y, outerRadius, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for (let point = 0; point < 10; point++) {
+      const radius = point % 2 === 0 ? outerRadius : outerRadius * 0.43;
+      const angle = -Math.PI / 2 + point * Math.PI / 5;
+      const px = Math.cos(angle) * radius;
+      const py = Math.sin(angle) * radius;
+      if (point === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawWheel(angle = 0) {
     ctx.clearRect(0, 0, size, size);
     ctx.save();
@@ -117,6 +157,14 @@
       ctx.lineWidth = 8;
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
+
+      // Christmas decorations on the wheel itself: a snowflake and gold stars per slice.
+      ctx.save();
+      ctx.rotate(start + slice / 2);
+      drawSnowflake(radius * 0.82, 0, 19, "#fff1c9");
+      drawStar(radius * 0.70, -24, 7, "#f4d27b");
+      drawStar(radius * 0.70, 24, 5.5, "#f4d27b");
+      ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
       const mid = start + slice / 2;
