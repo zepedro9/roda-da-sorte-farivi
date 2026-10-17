@@ -120,6 +120,57 @@
     ctx.restore();
   }
 
+  function drawSleigh(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    // Sleigh body and curled-up front.
+    ctx.beginPath();
+    ctx.moveTo(-12, 2);
+    ctx.lineTo(9, 2);
+    ctx.quadraticCurveTo(13, 2, 11, -3);
+    ctx.moveTo(-12, 2);
+    ctx.quadraticCurveTo(-8, 10, 2, 10);
+    ctx.lineTo(10, 7);
+    ctx.moveTo(-8, -3);
+    ctx.lineTo(-5, 2);
+    ctx.stroke();
+    // Small gift in the sleigh.
+    ctx.strokeRect(-5, -10, 10, 7);
+    ctx.beginPath();
+    ctx.moveTo(0, -10);
+    ctx.lineTo(0, -3);
+    ctx.moveTo(-5, -7);
+    ctx.lineTo(5, -7);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawGift(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = "round";
+    ctx.strokeRect(-9, -5, 18, 15);
+    ctx.beginPath();
+    ctx.moveTo(-11, -5);
+    ctx.lineTo(11, -5);
+    ctx.moveTo(0, -5);
+    ctx.lineTo(0, 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(-3.5, -9, 4, 2.5, -0.5, 0, Math.PI * 2);
+    ctx.ellipse(3.5, -9, 4, 2.5, 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawTinyTree(x, y, color) {
     ctx.save();
     ctx.translate(x, y);
@@ -182,10 +233,13 @@
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      // One snowflake per slice, kept near the outer edge to avoid overlapping prize labels.
+      // Rotate through three Christmas icons, all kept above the prize labels.
       ctx.save();
       ctx.rotate(start + slice / 2);
-      drawSnowflake(radius * 0.81, 0, 18, "#fff1c9");
+      const iconX = radius * 0.81;
+      if (i % 3 === 0) drawSnowflake(iconX, 0, 18, "#fff1c9");
+      else if (i % 3 === 1) drawSleigh(iconX, 0, "#fff1c9");
+      else drawGift(iconX, 0, "#fff1c9");
       ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
@@ -246,12 +300,18 @@
     const endRotation = startRotation + extraTurns * Math.PI * 2 + delta;
     const duration = 4800 + Math.random() * 500;
     const startTime = performance.now();
+    let snowStarted = false;
 
     function frame(now) {
       const progress = Math.min(1, (now - startTime) / duration);
       rotation = startRotation + (endRotation - startRotation) * easeOutQuint(progress);
       drawWheel(rotation);
       playWheelTick(progress);
+      // Begin snowfall during the final part of the spin rather than after the result.
+      if (progress >= 0.72 && !snowStarted) {
+        snowStarted = true;
+        burstConfetti();
+      }
       if (progress < 1) {
         requestAnimationFrame(frame);
       } else {
@@ -262,7 +322,6 @@
         spinButton.classList.add("is-finished");
         buttonLabel.textContent = prizes[selectedPrizeIndex];
         playCelebrationSound();
-        burstConfetti();
       }
     }
     requestAnimationFrame(frame);
@@ -295,12 +354,12 @@
       snowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    for (let i = 0; i < 170; i++) {
+    for (let i = 0; i < 220; i++) {
       flakes.push({
         x: Math.random() * width,
         y: Math.random() * height - height,
         r: 1.5 + Math.random() * 3.5,
-        speed: 0.7 + Math.random() * 2.1,
+        speed: 1.5 + Math.random() * 3.0,
         drift: (Math.random() - 0.5) * 0.9,
         sway: Math.random() * Math.PI * 2,
         swaySpeed: 0.008 + Math.random() * 0.018,
@@ -309,12 +368,12 @@
     }
 
     const started = performance.now();
-    const duration = 8500;
+    const duration = 9000;
     let frameId;
     function animate(now) {
       const elapsed = now - started;
       snowCtx.clearRect(0, 0, width, height);
-      snowCtx.globalAlpha = Math.max(0, Math.min(1, (duration - elapsed) / 1400));
+      snowCtx.globalAlpha = Math.max(0, Math.min(1, (duration - elapsed) / 1100));
       for (const flake of flakes) {
         flake.sway += flake.swaySpeed;
         flake.x += flake.drift + Math.sin(flake.sway) * 0.65;
