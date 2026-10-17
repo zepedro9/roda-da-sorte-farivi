@@ -233,18 +233,16 @@
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      // Rotate through three Christmas icons, all kept above the prize labels.
+      // Three Christmas icons, with a shared visual footprint, positioned consistently in each slice.
       ctx.save();
       ctx.rotate(start + slice / 2);
       const iconX = radius * 0.81;
-      ctx.save();
-      ctx.rotate(- (start + slice / 2));
       ctx.translate(iconX, 0);
-      ctx.scale(0.78, 0.78);
-      if (i % 3 === 0) drawSnowflake(0, 0, 16, "#fff1c9");
+      ctx.rotate(-Math.PI / 2);
+      ctx.scale(0.82, 0.82);
+      if (i % 3 === 0) drawSnowflake(0, 0, 18, "#fff1c9");
       else if (i % 3 === 1) drawSleigh(0, 0, "#fff1c9");
       else drawGift(0, 0, "#fff1c9");
-      ctx.restore();
       ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
@@ -368,12 +366,12 @@
     }
 
     const started = performance.now();
-    const duration = 9000;
+    const duration = 4500;
     let frameId;
     function animate(now) {
       const elapsed = now - started;
       snowCtx.clearRect(0, 0, width, height);
-      snowCtx.globalAlpha = Math.max(0, Math.min(1, (duration - elapsed) / 1100));
+      snowCtx.globalAlpha = Math.max(0, Math.min(1, (duration - elapsed) / 700));
       for (const flake of flakes) {
         flake.sway += flake.swaySpeed;
         flake.x += flake.drift + Math.sin(flake.sway) * 0.65;
