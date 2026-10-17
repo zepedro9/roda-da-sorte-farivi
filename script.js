@@ -182,13 +182,10 @@
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      // Christmas decorations on the wheel itself: a snowflake and gold stars per slice.
+      // One snowflake per slice, kept near the outer edge to avoid overlapping prize labels.
       ctx.save();
       ctx.rotate(start + slice / 2);
-      drawSnowflake(radius * 0.82, 0, 21, "#fff1c9");
-      drawStar(radius * 0.70, -24, 7, "#f4d27b");
-      drawStar(radius * 0.70, 24, 5.5, "#f4d27b");
-      if (i % 2 === 0) drawTinyTree(radius * 0.72, 0, "#f4d27b");
+      drawSnowflake(radius * 0.81, 0, 18, "#fff1c9");
       ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
@@ -272,31 +269,81 @@
   }
 
   function burstConfetti() {
-    // A magical snowfall replaces the confetti when the prize is revealed.
-    if (typeof confetti !== "function") return;
+    // A dedicated canvas makes the snowfall reliable across mobile browsers.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const snowflake = typeof confetti.shapeFromText === "function"
-      ? confetti.shapeFromText({ text: "❄", scalar: 1.7 })
-      : null;
-    const snowColors = ["#ffffff", "#eaf7ff", "#d3eaff", "#fff1c9"];
-    const base = {
-      colors: snowColors,
-      shapes: snowflake ? [snowflake] : ["circle"],
-      zIndex: 20,
-      disableForReducedMotion: true
+    const snowCanvas = document.createElement("canvas");
+    snowCanvas.setAttribute("aria-hidden", "true");
+    snowCanvas.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+    document.body.appendChild(snowCanvas);
+    const snowCtx = snowCanvas.getContext("2d");
+    if (!snowCtx) {
+      snowCanvas.remove();
+      return;
+    }
+
+    let width = 0;
+    let height = 0;
+    const flakes = [];
+    const colors = ["#ffffff", "#eaf7ff", "#d3eaff", "#fff1c9"];
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      snowCanvas.width = Math.round(width * dpr);
+      snowCanvas.height = Math.round(height * dpr);
+      snowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
-    const snow = (options) => confetti(Object.assign({}, base, options));
+    resize();
+    for (let i = 0; i < 170; i++) {
+      flakes.push({
+        x: Math.random() * width,
+        y: Math.random() * height - height,
+        r: 1.5 + Math.random() * 3.5,
+        speed: 0.7 + Math.random() * 2.1,
+        drift: (Math.random() - 0.5) * 0.9,
+        sway: Math.random() * Math.PI * 2,
+        swaySpeed: 0.008 + Math.random() * 0.018,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
 
-    // Gentle snowfall from across the top of the screen, rather than an explosive burst.
-    snow({ particleCount: 90, spread: 180, startVelocity: 8, gravity: 0.42, decay: 0.985, ticks: 420, scalar: 1.25, origin: { x: 0.5, y: -0.05 }, drift: 0.25 });
-    snow({ particleCount: 55, spread: 150, startVelocity: 5, gravity: 0.3, decay: 0.99, ticks: 520, scalar: 0.85, origin: { x: 0.15, y: -0.03 }, drift: 0.8 });
-    snow({ particleCount: 55, spread: 150, startVelocity: 5, gravity: 0.3, decay: 0.99, ticks: 520, scalar: 0.85, origin: { x: 0.85, y: -0.03 }, drift: -0.8 });
+    const started = performance.now();
+    const duration = 8500;
+    let frameId;
+    function animate(now) {
+      const elapsed = now - started;
+      snowCtx.clearRect(0, 0, width, height);
+      snowCtx.globalAlpha = Math.max(0, Math.min(1, (duration - elapsed) / 1400));
+      for (const flake of flakes) {
+        flake.sway += flake.swaySpeed;
+        flake.x += flake.drift + Math.sin(flake.sway) * 0.65;
+        flake.y += flake.speed;
+        if (flake.y > height + 8) {
+          flake.y = -8;
+          flake.x = Math.random() * width;
+        }
+        if (flake.x < -8) flake.x = width + 8;
+        if (flake.x > width + 8) flake.x = -8;
 
-    // A second, softer wave makes the snowfall feel like a festive reveal.
-    setTimeout(() => {
-      snow({ particleCount: 70, spread: 180, startVelocity: 6, gravity: 0.34, decay: 0.99, ticks: 500, scalar: 1, origin: { x: 0.5, y: -0.04 }, drift: -0.35 });
-    }, 500);
+        snowCtx.beginPath();
+        snowCtx.fillStyle = flake.color;
+        snowCtx.shadowColor = flake.color;
+        snowCtx.shadowBlur = flake.r * 2;
+        snowCtx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+        snowCtx.fill();
+      }
+      snowCtx.shadowBlur = 0;
+      snowCtx.globalAlpha = 1;
+      if (elapsed < duration) {
+        frameId = requestAnimationFrame(animate);
+      } else {
+        cancelAnimationFrame(frameId);
+        snowCanvas.remove();
+      }
+    }
+    frameId = requestAnimationFrame(animate);
+    window.addEventListener("resize", resize, { once: true });
   }
 
   spinButton.addEventListener("click", spin);
