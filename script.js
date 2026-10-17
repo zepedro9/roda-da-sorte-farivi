@@ -10,7 +10,7 @@
     "Vale 200€ para viagem"
   ];
   const selectedPrizeIndex = 5;
-  const colors = ["#e53935", "#f9a825", "#43a047", "#1e88e5", "#8e24aa", "#00acc1"];
+  const colors = ["#a8242b", "#1b5b3b", "#c33a32", "#246347", "#8d2028", "#2c704b"];
   const canvas = document.getElementById("wheel");
   const ctx = canvas && canvas.getContext("2d");
   const spinButton = document.getElementById("spin-button");
@@ -120,6 +120,30 @@
     ctx.restore();
   }
 
+  function drawTinyTree(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(0, -13);
+    ctx.lineTo(-8, -3);
+    ctx.lineTo(-4, -3);
+    ctx.lineTo(-11, 5);
+    ctx.lineTo(-4, 5);
+    ctx.lineTo(-4, 11);
+    ctx.lineTo(4, 11);
+    ctx.lineTo(4, 5);
+    ctx.lineTo(11, 5);
+    ctx.lineTo(4, -3);
+    ctx.lineTo(8, -3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawStar(x, y, outerRadius, color) {
     ctx.save();
     ctx.translate(x, y);
@@ -161,9 +185,10 @@
       // Christmas decorations on the wheel itself: a snowflake and gold stars per slice.
       ctx.save();
       ctx.rotate(start + slice / 2);
-      drawSnowflake(radius * 0.82, 0, 19, "#fff1c9");
+      drawSnowflake(radius * 0.82, 0, 21, "#fff1c9");
       drawStar(radius * 0.70, -24, 7, "#f4d27b");
       drawStar(radius * 0.70, 24, 5.5, "#f4d27b");
+      if (i % 2 === 0) drawTinyTree(radius * 0.72, 0, "#f4d27b");
       ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
@@ -247,32 +272,31 @@
   }
 
   function burstConfetti() {
-    // A much bigger, multi-wave celebration using canvas-confetti.
+    // A magical snowfall replaces the confetti when the prize is revealed.
     if (typeof confetti !== "function") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const palette = ["#e53935", "#f9a825", "#43a047", "#1e88e5", "#8e24aa", "#00acc1", "#ffffff"];
-    const base = { colors: palette, zIndex: 20, disableForReducedMotion: true };
-    const fire = (options) => confetti(Object.assign({}, base, options));
-
-    // Dense central blast with broad, overlapping layers.
-    fire({ particleCount: 180, spread: 78, startVelocity: 58, origin: { x: 0.5, y: 0.62 }, scalar: 1.15, ticks: 260 });
-    fire({ particleCount: 140, spread: 115, startVelocity: 48, decay: 0.91, origin: { x: 0.5, y: 0.62 }, scalar: 1.05, ticks: 280 });
-    fire({ particleCount: 90, spread: 145, startVelocity: 36, decay: 0.92, origin: { x: 0.5, y: 0.62 }, scalar: 1.35, shapes: ["square", "star"], ticks: 300 });
-
-    // Big cannons from both sides, followed by two extra volleys.
-    const sideVolley = () => {
-      fire({ particleCount: 90, angle: 60, spread: 72, startVelocity: 58, origin: { x: 0.02, y: 0.72 }, scalar: 1.05, ticks: 260 });
-      fire({ particleCount: 90, angle: 120, spread: 72, startVelocity: 58, origin: { x: 0.98, y: 0.72 }, scalar: 1.05, ticks: 260 });
+    const snowflake = typeof confetti.shapeFromText === "function"
+      ? confetti.shapeFromText({ text: "❄", scalar: 1.7 })
+      : null;
+    const snowColors = ["#ffffff", "#eaf7ff", "#d3eaff", "#fff1c9"];
+    const base = {
+      colors: snowColors,
+      shapes: snowflake ? [snowflake] : ["circle"],
+      zIndex: 20,
+      disableForReducedMotion: true
     };
-    setTimeout(sideVolley, 180);
+    const snow = (options) => confetti(Object.assign({}, base, options));
+
+    // Gentle snowfall from across the top of the screen, rather than an explosive burst.
+    snow({ particleCount: 90, spread: 180, startVelocity: 8, gravity: 0.42, decay: 0.985, ticks: 420, scalar: 1.25, origin: { x: 0.5, y: -0.05 }, drift: 0.25 });
+    snow({ particleCount: 55, spread: 150, startVelocity: 5, gravity: 0.3, decay: 0.99, ticks: 520, scalar: 0.85, origin: { x: 0.15, y: -0.03 }, drift: 0.8 });
+    snow({ particleCount: 55, spread: 150, startVelocity: 5, gravity: 0.3, decay: 0.99, ticks: 520, scalar: 0.85, origin: { x: 0.85, y: -0.03 }, drift: -0.8 });
+
+    // A second, softer wave makes the snowfall feel like a festive reveal.
     setTimeout(() => {
-      fire({ particleCount: 100, spread: 100, startVelocity: 46, origin: { x: 0.5, y: 0.55 }, scalar: 1.1, ticks: 280 });
-      sideVolley();
-    }, 650);
-    setTimeout(() => {
-      fire({ particleCount: 70, spread: 130, startVelocity: 34, decay: 0.92, origin: { x: 0.5, y: 0.55 }, scalar: 1.3, shapes: ["square", "star"], ticks: 300 });
-    }, 1150);
+      snow({ particleCount: 70, spread: 180, startVelocity: 6, gravity: 0.34, decay: 0.99, ticks: 500, scalar: 1, origin: { x: 0.5, y: -0.04 }, drift: -0.35 });
+    }, 500);
   }
 
   spinButton.addEventListener("click", spin);
