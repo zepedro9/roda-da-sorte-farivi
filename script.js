@@ -237,9 +237,14 @@
       ctx.save();
       ctx.rotate(start + slice / 2);
       const iconX = radius * 0.81;
-      if (i % 3 === 0) drawSnowflake(iconX, 0, 18, "#fff1c9");
-      else if (i % 3 === 1) drawSleigh(iconX, 0, "#fff1c9");
-      else drawGift(iconX, 0, "#fff1c9");
+      ctx.save();
+      ctx.rotate(- (start + slice / 2));
+      ctx.translate(iconX, 0);
+      ctx.scale(0.78, 0.78);
+      if (i % 3 === 0) drawSnowflake(0, 0, 16, "#fff1c9");
+      else if (i % 3 === 1) drawSleigh(0, 0, "#fff1c9");
+      else drawGift(0, 0, "#fff1c9");
+      ctx.restore();
       ctx.restore();
 
       // Place wrapped labels tangentially inside each slice.
@@ -300,18 +305,12 @@
     const endRotation = startRotation + extraTurns * Math.PI * 2 + delta;
     const duration = 4800 + Math.random() * 500;
     const startTime = performance.now();
-    let snowStarted = false;
 
     function frame(now) {
       const progress = Math.min(1, (now - startTime) / duration);
       rotation = startRotation + (endRotation - startRotation) * easeOutQuint(progress);
       drawWheel(rotation);
       playWheelTick(progress);
-      // Begin snowfall during the final part of the spin rather than after the result.
-      if (progress >= 0.72 && !snowStarted) {
-        snowStarted = true;
-        burstConfetti();
-      }
       if (progress < 1) {
         requestAnimationFrame(frame);
       } else {
@@ -322,6 +321,7 @@
         spinButton.classList.add("is-finished");
         buttonLabel.textContent = prizes[selectedPrizeIndex];
         playCelebrationSound();
+        burstConfetti();
       }
     }
     requestAnimationFrame(frame);
@@ -354,7 +354,7 @@
       snowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    for (let i = 0; i < 220; i++) {
+    for (let i = 0; i < 170; i++) {
       flakes.push({
         x: Math.random() * width,
         y: Math.random() * height - height,
