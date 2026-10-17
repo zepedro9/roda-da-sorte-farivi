@@ -239,7 +239,8 @@
       const iconX = radius * 0.81;
       ctx.translate(iconX, 0);
       ctx.rotate(-Math.PI / 2);
-      ctx.scale(0.82, 0.82);
+      // Enlarge all three icons equally and mirror them horizontally so they face outwards.
+      ctx.scale(-1.23, 1.23);
       if (i % 3 === 0) drawSnowflake(0, 0, 18, "#fff1c9");
       else if (i % 3 === 1) drawSleigh(0, 0, "#fff1c9");
       else drawGift(0, 0, "#fff1c9");
